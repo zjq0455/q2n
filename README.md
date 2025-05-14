@@ -8,6 +8,7 @@ Existing post-training quantization methods for large language models (LLMs) off
 
 ```
 conda create -n q2n python=3.10
+conda activate q2n
 cd q2n
 pip install -r requirements.txt
 ```
