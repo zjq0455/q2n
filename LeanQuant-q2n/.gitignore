@@ -1,0 +1,4 @@
+__pycache__
+*.log
+*.safetensors
+*egg-info*
