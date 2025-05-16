@@ -58,6 +58,7 @@ python main.py --model meta-llama/Llama-3.3-70B-Instruct --cal_dataset c4 --rota
 CUDA_VISIBLE_DEVICES=1,6  lm_eval --model hf --model_args pretrained="<PATH_NAME>",parallelize=True \
 --tasks hellaswag,winogrande,piqa,arc_easy,arc_challenge,mmlu,race --batch_size auto
 ```
+For running this command please follow the instruction in the repository of `lm-eval-harness`.
 
 
 ## Related Project
