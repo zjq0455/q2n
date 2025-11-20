@@ -148,7 +148,7 @@ def llama_sequential(args, model, dataloader, dev):
                 quant_method[name].fasterquant(groupsize=args.groupsize)
             elif args.quant in ['bitbal','parbal','allbal','allbal_block','allbal_clipevery','allbal_stochinit',
             'ldlq','ldlqRG','ldlqRG_block','ldlbal_admm']:
-                quant_method[name].fasterquant(args.threshold, args.lambda, name)
+                quant_method[name].fasterquant(args.threshold, args.lambda1, name)
             elif args.quant == 'nearest':
                 quant_method[name].fasterquant()
 
@@ -513,7 +513,7 @@ if __name__ == '__main__':
         help='Threshold for null space approximation'
     )
     parser.add_argument(
-        '--lambda', type=float, default=0.2,
+        '--lambda1', type=float, default=0.2,
         help='Regularization for equivalent vector'
     )  
     args = parser.parse_args()

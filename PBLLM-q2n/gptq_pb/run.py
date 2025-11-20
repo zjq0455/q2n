@@ -162,7 +162,7 @@ def quant_sequential(args, model, dataloader, dev):
         for name in gpts:
             print(i, name)
             print("Quantizing ...")
-            info = gpts[name].fasterquant(args.threshold, args.lambda, 
+            info = gpts[name].fasterquant(args.threshold, args.lambda1, 
                 name, args.low_frac, percdamp=args.percdamp, blocksize=args.blocksize
             )
             gpts[name].free()
@@ -276,7 +276,7 @@ if __name__ == "__main__":
         help='Threshold for null space approximation'
     )
     parser.add_argument(
-        '--lambda', type=float, default=0.2,
+        '--lambda1', type=float, default=0.2,
         help='Regularization for equivalent vector'
     )  
 

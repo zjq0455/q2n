@@ -17,7 +17,7 @@ def get_llama(model):
     torch.nn.init.kaiming_uniform_ = skip
     torch.nn.init.uniform_ = skip
     torch.nn.init.normal_ = skip
-    from transformers import LlamaForCausalLM
+    from transformers import LlamaForCausalLM,AutoModelForCausalLM
     model = LlamaForCausalLM.from_pretrained(model, torch_dtype='auto')
     model.seqlen = 2048
     return model
@@ -25,9 +25,6 @@ def get_llama(model):
 @torch.no_grad()
 def llama_sequential(args, model, dataloader, dev):
     print('Starting ...')
-
-    loss_func = torch.nn.MSELoss()
-    cossim = nn.CosineSimilarity(dim=2)
 
     use_cache = model.config.use_cache
     model.config.use_cache = False
@@ -115,7 +112,7 @@ def llama_sequential(args, model, dataloader, dev):
             for name in subset:
                 print(i, name)
                 print('Quantizing ...')
-                gptq[name].fasterquant(args.threshold, args.lambda, i, name,
+                gptq[name].fasterquant(args.threshold, args.lambda1, i, name,
                     percdamp=args.percdamp, groupsize=args.groupsize, actorder=args.act_order, static_groups=args.static_groups
                 )
                 quantizers['model.layers.%d.%s' % (i, name)] = gptq[name].quantizer
@@ -253,7 +250,7 @@ if __name__ == '__main__':
     from datautils import *
 
     parser = argparse.ArgumentParser()
-
+    
     parser.add_argument(
         'model', type=str,
         help='LlaMa model to load; pass location of hugginface converted checkpoint.'
@@ -319,7 +316,7 @@ if __name__ == '__main__':
         help='Threshold for null space approximation'
     )
     parser.add_argument(
-        '--lambda', type=float, default=0.2,
+        '--lambda1', type=float, default=0.2,
         help='Regularization for equivalent vector'
     )   
 

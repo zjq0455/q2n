@@ -15,7 +15,7 @@ torch.backends.cuda.matmul.allow_tf32 = False
 torch.backends.cudnn.allow_tf32 = False
 
 import csv
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 
 # from sklearn.utils.extmath import randomized_svd
 
@@ -193,7 +193,6 @@ class GPTQ:
         if name != 'mlp.down_proj':
             X = torch.mm(self.average_x.t(), self.average_x) #/ 2048
 
-
             tick = time.time()
             eigvals, eigvecs = torch.linalg.eigh(X)
             sorted_indices = torch.argsort(eigvals, descending=True)
@@ -211,18 +210,26 @@ class GPTQ:
                 lambda_reg = lambda_t
                 self.p = p.detach()
 
-                m = torch.ones(Q.shape[0], device=self.dev, requires_grad=True)
-                optimizer = torch.optim.Adam([m], lr=2e-3)
-                for _ in range(20):
-                    optimizer.zero_grad()
-                    I = torch.eye(Q.shape[1], device=self.dev)
-                    B = W @ (I - self.p) + Q @ self.p
-                    residual = B - m.unsqueeze(1) * Q
-                    loss = torch.sum(residual ** 2) + lambda_reg * torch.sum((m - 1) ** 2)
-                    loss.backward()
-                    optimizer.step()
+                I = torch.eye(Q.shape[1], device=self.dev)
+                B = W @ (I - self.p) + Q @ self.p
+                numerator = torch.sum(B * Q, dim=1) + lambda_reg            # (1024,)
+                denominator = torch.sum(Q ** 2, dim=1) + lambda_reg           # (1024,)
+
+                m = numerator / (denominator + 1e-8)
+                Q = m.unsqueeze(1) * Q
+
+                # m = torch.ones(Q.shape[0], device=self.dev, requires_grad=True)
+                # optimizer = torch.optim.AdamW([m], lr=2e-3)
+                # for _ in range(20):
+                #     optimizer.zero_grad()
+                #     I = torch.eye(Q.shape[1], device=self.dev)
+                #     B = W @ (I - self.p) + Q @ self.p
+                #     residual = B - m.unsqueeze(1) * Q
+                #     loss = torch.sum(residual ** 2) + lambda_reg * torch.sum((m - 1) ** 2)
+                #     loss.backward()
+                #     optimizer.step()
                 
-                Q = m.detach().unsqueeze(1) * Q
+                # Q = m.detach().unsqueeze(1) * Q
 
         if actorder:
             Q = Q[:, invperm]

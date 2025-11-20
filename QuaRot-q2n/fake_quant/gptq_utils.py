@@ -298,7 +298,7 @@ def gptq_fwrd(args, model, dataloader, dev, args):
 
             for name in subset:
                 layer_w_groupsize = args.w_groupsize
-                gptq[name].fasterquant(args.threshold, args.lambda, name, 
+                gptq[name].fasterquant(args.threshold, args.lambda1, name, 
                     percdamp=args.percdamp, groupsize=layer_w_groupsize, actorder=args.act_order, static_groups=False
                 )
                 quantizers['model.layers.%d.%s' % (i, name)] = gptq[name].quantizer

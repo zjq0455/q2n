@@ -116,7 +116,7 @@ def llama_sequential(model, dataloader, dev):
             for name in subset:
                 print(i, name)
                 print('Quantizing ...')
-                gptq[name].fasterquant(i,name,
+                gptq[name].fasterquant(args.threshold, args.lambda1, i,name,
                     percdamp=args.percdamp, groupsize=args.groupsize, actorder=args.act_order, static_groups=args.static_groups
                 )
                 quantizers['model.layers.%d.%s' % (i, name)] = gptq[name].quantizer
@@ -280,7 +280,7 @@ if __name__ == '__main__':
         help='Whether to run the RTN baseline.'
     ) 
     parser.add_argument(
-        '--wbits', type=int, default=16, choices=[2, 3, 4, 8, 16],
+        '--wbits', type=int, default=16, choices=[2, 3, 4, 6, 8, 16],
         help='#bits to use for quantization; use 16 for evaluating base model.'
     )
     parser.add_argument(
@@ -311,6 +311,14 @@ if __name__ == '__main__':
         '--static-groups', action='store_true',
         help='Whether to use static groups; recommended when using `--actorder` for more efficient inference.'
     )
+    parser.add_argument(
+        '--threshold', type=float, default=0.1,
+        help='Threshold for null space approximation'
+    )
+    parser.add_argument(
+        '--lambda1', type=float, default=0.2,
+        help='Regularization for equivalent vector'
+    )   
 
     args = parser.parse_args()
 

@@ -192,7 +192,7 @@ def parser_gen():
         help='Threshold for null space approximation'
     )
     parser.add_argument(
-        '--lambda', type=float, default=0.2,
+        '--lambda1', type=float, default=0.2,
         help='Regularization for equivalent vector'
     )  
 
